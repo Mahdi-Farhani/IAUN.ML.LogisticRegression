@@ -41,9 +41,9 @@ public class DataPreparation
     {
         var count = dataset.Count;
         var cpItems = dataset.GroupBy(x => x.CP).Select(x => x.Key).ToList();
-        var featuresCount = 8 + cpItems.Count;
+        var featuresCount = 6 + cpItems.Count;
 
-        var newDataset = dataset.Select(x => new DatasetInfo { HeartDiseaseId = x.HeartDiseaseId, Features = ColumnToFeature(featuresCount, cpItems, x) }).ToList();
+        var newDataset = dataset.Select(x => new DatasetInfo { HeartDiseaseId = x.HeartDiseaseId, Features = ColumnToFeature(featuresCount, cpItems, x), Label = x.EncodedNum }).ToList();
         return newDataset;
 
     }
@@ -53,16 +53,15 @@ public class DataPreparation
         var features = new double[featuresCount];
         var index = 0;
         features[index++] = x.Age;
-        for (int i = 0; i < cpItems.Count; i++, ++index)
+        for (int i = 0; i < cpItems.Count; i++)
         {
-            features[index] = x.CP == cpItems[i] ? 1 : 0;
+            features[index++] = x.CP == cpItems[i] ? 1 : 0;
         }
-        features[++index] = x.TrestBPS;
-        features[++index] = x.Cholestrol;
-        features[++index] = x.Thalch;
-        features[++index] = x.OldPeak;
-        features[++index] = x.CA;
-        features[++index] = x.EncodedNum;
+        features[index++] = x.TrestBPS;
+        features[index++] = x.Cholestrol;
+        features[index++] = x.Thalch;
+        features[index++] = x.OldPeak;
+        features[index++] = x.CA;
         return features;
     }
 
@@ -70,24 +69,23 @@ public class DataPreparation
     {
         var count = dataset.Count;
         var cpItems = dataset.GroupBy(x => x.CP).Select(x => x.Key).ToList();
-        var featuresCount = 8 + cpItems.Count;
+        
 
-        var newDataset = dataset.Select(x => new DatasetInfo { HeartDiseaseId = x.HeartDiseaseId, Features = ColumnToLabel(featuresCount, cpItems, x) }).ToList();
+        var newDataset = dataset.Select(x => new DatasetInfo { HeartDiseaseId = x.HeartDiseaseId, Features = ColumnToLabel(cpItems, x) ,Label=x.EncodedNum}).ToList();
         return newDataset;
     }
 
-    private static double[] ColumnToLabel(int featuresCount, List<string> cpItems, HeartDiseaseInfo x)
+    private static double[] ColumnToLabel( List<string> cpItems, HeartDiseaseInfo x)
     {
-        var features = new double[featuresCount];
+        var features = new double[7];
         var index = 0;
-        features[index] = x.Age;
-        features[++index] = cpItems.IndexOf(x.CP);
-        features[++index] = x.TrestBPS;
-        features[++index] = x.Cholestrol;
-        features[++index] = x.Thalch;
-        features[++index] = x.OldPeak;
-        features[++index] = x.CA;
-        features[++index] = x.EncodedNum;
+        features[index++] = x.Age;
+        features[index++] = cpItems.IndexOf(x.CP);
+        features[index++] = x.TrestBPS;
+        features[index++] = x.Cholestrol;
+        features[index++] = x.Thalch;
+        features[index++] = x.OldPeak;
+        features[index++] = x.CA;
         return features;
     }
 
